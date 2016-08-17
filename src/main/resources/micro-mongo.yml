@@ -1,0 +1,15 @@
+server:
+  contextPath: /mongo/rest
+  port: 80
+
+spring:
+  freemarker:
+    checkTemplateLocation: false
+  velocity:
+    checkTemplateLocation: false
+  data:
+    mongodb:
+      database: test
+      host: localhost
+      port: 27017
+      
