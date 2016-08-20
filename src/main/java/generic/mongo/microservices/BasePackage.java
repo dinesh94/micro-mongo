@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dinesh.microservices;
+package generic.mongo.microservices;
 
 /**
  * @author Dinesh

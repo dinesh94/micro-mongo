@@ -1,4 +1,4 @@
-package dinesh.microservices;
+package generic.mongo.microservices;
 
 import java.net.UnknownHostException;
 

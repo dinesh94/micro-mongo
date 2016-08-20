@@ -1,7 +1,7 @@
 /**
  * 
  */
-package dinesh.microservices;
+package generic.mongo.microservices.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package dinesh.microservices;
+package generic.mongo.microservices.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

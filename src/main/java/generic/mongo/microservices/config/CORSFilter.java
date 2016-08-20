@@ -1,4 +1,4 @@
-package dinesh.microservices;
+package generic.mongo.microservices.config;
 
 import java.io.IOException;
 
