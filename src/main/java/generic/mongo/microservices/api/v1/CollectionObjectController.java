@@ -4,9 +4,12 @@
 package generic.mongo.microservices.api.v1;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.annotation.Resource;
 
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -51,7 +57,7 @@ public class CollectionObjectController {
 
 		return new ResponseEntity<>(documents, HttpStatus.FOUND);
 	}
-	
+
 	/**
 	 * POST WILL CREATE A NEW OBJECT IN THE DATABSE, WITH GENERATED ID
 	 * 
@@ -64,11 +70,11 @@ public class CollectionObjectController {
 			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@RequestBody String jsonString) throws JsonParseException, JsonMappingException, IOException {
-	
+
 		MongoCollection<Document> collection = mongoClient.getDatabase(dbName).getCollection(collectionName);
 		Document doc = Document.parse(jsonString);
 		Object objectId = doc.get("_id");
-	
+
 		if (objectId != null) {
 			Document existingDocument = CommonUtil.findOneObject(collection, objectId.toString());
 			if (existingDocument != null) {
@@ -82,10 +88,10 @@ public class CollectionObjectController {
 			objectId = CommonUtil.getId();
 			insertNew(collection, objectId.toString(), doc);
 		}
-	
+
 		return new ResponseEntity<>(doc, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dbs/{db}/{collection}/{id}")
 	public synchronized ResponseEntity<?> deleteObject(
 			@PathVariable("db") String dbName,
@@ -95,7 +101,7 @@ public class CollectionObjectController {
 		Long deleteCount = doDelete(collection, idParam);
 		return new ResponseEntity<>(deleteCount, HttpStatus.FOUND);
 	}
-	
+
 	/** PUT WILL REPLACE WHOLE OBJECT, WHICH IS ALREADY PRESENT IN THE DATABASE **/
 	/**
 	 * @throws IOException
@@ -119,7 +125,7 @@ public class CollectionObjectController {
 
 		return new ResponseEntity<>(doc, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * PATHC WILL MERGE EXISTING OBJECT, IF OBJECT DOES NOT EXIST IT WILL PERFORM PUT
 	 * 
@@ -147,6 +153,55 @@ public class CollectionObjectController {
 		return new ResponseEntity<>(doc, HttpStatus.OK);
 	}
 
+	@RequestMapping(method = { RequestMethod.POST }, value = "/dbs/{db}/{collection}/bulksaveupdate")
+	public synchronized ResponseEntity<?> bulkFindAndModifyElseCreate(
+			@PathVariable("db") String dbName,
+			@PathVariable("collection") String collectionName,
+			@RequestBody String jsonString) throws JsonParseException, JsonMappingException, IOException {
+
+		final MongoCollection<Document> collection = mongoClient.getDatabase(dbName).getCollection(collectionName);
+
+		final List<Document> documents = new ArrayList<Document>();
+
+		JsonParser jsonParser = new JsonParser();
+		JsonArray jsonArray;
+		try {
+			jsonArray = (JsonArray) jsonParser.parse(jsonString);
+		} catch (Exception e1) {
+			jsonArray = new JsonArray();
+			jsonArray.add(jsonParser.parse(jsonString));
+			System.out.println("CollectionObjectController.bulkFindAndModifyElseCreate() " + e1.getMessage());
+		}
+		Iterator<JsonElement> iterator = jsonArray.iterator();
+		iterator.forEachRemaining(new Consumer<JsonElement>() {
+			@Override
+			public void accept(JsonElement jsonElement) {
+
+				Document doc = Document.parse(jsonElement.getAsJsonObject().toString());
+				String _id = doc.get("_id") != null ? doc.get("_id").toString() : null;
+				if (_id != null) {
+					Document existingDocument = CommonUtil.findOneObject(collection, _id);
+					if (existingDocument != null) {
+						// Merge both the document, override existing properties & add newly added properties
+						try {
+							doc = doPatch(collection, existingDocument, doc);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else {
+						insertNew(collection, _id, doc);
+					}
+				} else {
+					String objectId = CommonUtil.getId();
+					insertNew(collection, objectId.toString(), doc);
+				}
+
+				documents.add(doc);
+			}
+
+		});
+		return new ResponseEntity<>(documents, HttpStatus.OK);
+	}
 
 	private void insertNew(MongoCollection<Document> collection, String objectId, Document doc) {
 		doc.append("_id", objectId);
@@ -160,7 +215,7 @@ public class CollectionObjectController {
 		collection.findOneAndReplace(existingDocument, mergedDoc);
 		return mergedDoc;
 	}
-	
+
 	private long doDelete(MongoCollection<Document> collection, String idParam) {
 		BasicDBObject query = new BasicDBObject();
 		query.put("_id", idParam);
@@ -168,7 +223,7 @@ public class CollectionObjectController {
 		DeleteResult deleteResult = collection.deleteOne(query);
 		return deleteResult.getDeletedCount();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Document merge(Document existingDocument, Document docFromUI) throws JsonParseException, JsonMappingException, IOException {
 		String mergedJson = "";

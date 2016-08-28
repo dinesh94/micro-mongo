@@ -45,7 +45,7 @@
 			<artifactId>json-path</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -61,7 +61,12 @@
 			<artifactId>bootstrap</artifactId>
 			<version>3.3.5</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
