@@ -1,14 +1,13 @@
 /**
  * 
  */
-package generic.mongo.microservices.controller;
+package generic.mongo.microservices.api.v1;
 
 import java.io.IOException;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +33,7 @@ import generic.mongo.microservices.util.CommonUtil;
  *
  */
 @RestController
+@RequestMapping("api/v1/*")
 public class FileController {
 
 	private static final String ROOT = null;

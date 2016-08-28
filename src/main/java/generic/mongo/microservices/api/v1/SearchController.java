@@ -1,7 +1,7 @@
 /**
  * 
  */
-package generic.mongo.microservices.controller;
+package generic.mongo.microservices.api.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,12 +34,13 @@ import com.mongodb.client.MongoCollection;
  *
  */
 @RestController
+@RequestMapping("api/v1/*")
 public class SearchController {
 
 	@Resource
 	MongoClient mongoClient;
 
-	@RequestMapping("/dbs/{db}/{collection}")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs/{db}/{collection}")
 	public synchronized ResponseEntity<?> search(
 			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
@@ -77,11 +79,10 @@ public class SearchController {
 				result.add(document);
 			}
 		});
-
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
-	@RequestMapping("/dbs/{db}/{collection}/{keyword}/search")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs/{db}/{collection}/{keyword}/search")
 	public synchronized ResponseEntity<?> search(@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@PathVariable("keyword") String keyword,
@@ -118,7 +119,6 @@ public class SearchController {
 			});
 
 		}
-
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 }

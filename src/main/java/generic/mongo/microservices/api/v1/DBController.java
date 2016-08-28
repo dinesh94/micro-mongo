@@ -1,7 +1,7 @@
 /**
  * 
  */
-package generic.mongo.microservices.controller;
+package generic.mongo.microservices.api.v1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.MongoClient;
@@ -23,12 +24,13 @@ import com.mongodb.client.MongoDatabase;
  *
  */
 @RestController
+@RequestMapping("api/v1/*")
 public class DBController {
 
 	@Resource
 	MongoClient mongoClient;
 
-	@RequestMapping("/dbs")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs")
 	public synchronized ResponseEntity<?> dbs() {
 		List<String> dbs = new ArrayList<>();
 		MongoCursor<String> dbsCursor = mongoClient.listDatabaseNames().iterator();
@@ -39,7 +41,7 @@ public class DBController {
 		return new ResponseEntity<>(dbs, HttpStatus.OK);
 	}
 
-	@RequestMapping("/dbs/{db}")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs/{db}")
 	public synchronized ResponseEntity<?> db(@PathVariable("db") String dbName) {
 		MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
 		List<String> collections = new ArrayList<>();
