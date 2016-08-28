@@ -1,8 +1,9 @@
 /**
  * 
  */
-package generic.mongo.microservices.controller;
+package generic.mongo.microservices.api.v1;
 
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
+@RequestMapping("api/v1/*")
 public class MongoRestController {
 
 	/**

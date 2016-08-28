@@ -1,7 +1,7 @@
 /**
  * 
  */
-package generic.mongo.microservices.controller;
+package generic.mongo.microservices.api.v1;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,13 +34,15 @@ import generic.mongo.microservices.util.CommonUtil;
  *
  */
 @RestController
+@RequestMapping("api/v1/*")
 public class CollectionObjectController {
 
 	@Resource
 	MongoClient mongoClient;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/dbs/{db}/{collection}/{id}")
-	public synchronized ResponseEntity<?> getObject(@PathVariable("db") String dbName,
+	public synchronized ResponseEntity<?> getObject(
+			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@PathVariable("id") String idParam) {
 
@@ -58,7 +60,8 @@ public class CollectionObjectController {
 	 * @throws JsonParseException
 	 **/
 	@RequestMapping(method = RequestMethod.POST, value = "/dbs/{db}/{collection}")
-	public synchronized ResponseEntity<?> saveObject(@PathVariable("db") String dbName,
+	public synchronized ResponseEntity<?> saveObject(
+			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@RequestBody String jsonString) throws JsonParseException, JsonMappingException, IOException {
 	
@@ -84,7 +87,8 @@ public class CollectionObjectController {
 	}
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dbs/{db}/{collection}/{id}")
-	public synchronized ResponseEntity<?> deleteObject(@PathVariable("db") String dbName,
+	public synchronized ResponseEntity<?> deleteObject(
+			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@PathVariable("id") String idParam) {
 		MongoCollection<Document> collection = mongoClient.getDatabase(dbName).getCollection(collectionName);
@@ -99,7 +103,8 @@ public class CollectionObjectController {
 	 * @throws JsonParseException
 	 **/
 	@RequestMapping(method = { RequestMethod.PUT }, value = "/dbs/{db}/{collection}/{id}")
-	public synchronized ResponseEntity<?> put(@PathVariable("db") String dbName,
+	public synchronized ResponseEntity<?> put(
+			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@PathVariable("id") String idParam,
 			@RequestBody String jsonString) throws JsonParseException, JsonMappingException, IOException {
@@ -123,7 +128,8 @@ public class CollectionObjectController {
 	 * @throws JsonParseException
 	 **/
 	@RequestMapping(method = { RequestMethod.PATCH }, value = "/dbs/{db}/{collection}/{id}")
-	public synchronized ResponseEntity<?> patch(@PathVariable("db") String dbName,
+	public synchronized ResponseEntity<?> patch(
+			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
 			@PathVariable("id") String idParam,
 			@RequestBody String jsonString) throws JsonParseException, JsonMappingException, IOException {

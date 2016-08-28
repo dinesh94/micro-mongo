@@ -19,7 +19,9 @@ public class CommonUtil {
 
 	public static Document findOneObject(MongoCollection<Document> collection, String objectId) {
 		List<Document> result = findObjects(collection, objectId);
-		return result.get(0);
+		if(result != null && !result.isEmpty())
+			return result.get(0);
+		return null;
 	}
 	
 	public static List<Document> findObjects(MongoCollection<Document> collection, String objectId) {
