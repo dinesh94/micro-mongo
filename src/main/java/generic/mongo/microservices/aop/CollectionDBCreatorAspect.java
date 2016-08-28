@@ -66,7 +66,7 @@ public class CollectionDBCreatorAspect {
 	 * @return boolean
 	 */
 	private boolean isCollectionExist(String dbName, String collectionName) {
-		Set<String> existingCollectionsInDB = new HashSet<>();
+		final Set<String> existingCollectionsInDB = new HashSet<>();
 		MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
 		MongoIterable<String> iterator = mongoDatabase.listCollectionNames();
 		iterator.forEach(new Block<String>() {
@@ -84,7 +84,7 @@ public class CollectionDBCreatorAspect {
 	 * @return boolean
 	 */
 	private boolean isDatabaseExist(String dbName) {
-		Set<String> existingDatabases = new HashSet<>();
+		final Set<String> existingDatabases = new HashSet<>();
 		MongoIterable<String> iterator = mongoClient.listDatabaseNames();
 		iterator.forEach(new Block<String>() {
 			@Override
