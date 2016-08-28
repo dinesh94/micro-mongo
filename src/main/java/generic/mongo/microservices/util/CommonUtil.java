@@ -27,7 +27,7 @@ public class CommonUtil {
 		query.put("_id", objectId);
 		FindIterable<Document> iterable = collection.find(query);
 
-		List<Document> result = new ArrayList<>();
+		final List<Document> result = new ArrayList<>();
 		iterable.forEach(new Block<Document>() {
 			@Override
 			public void apply(final Document document) {

@@ -40,7 +40,7 @@ public class CollectionController {
 
 		iterable = collection.find();
 
-		List<Document> result = new ArrayList<>();
+		final List<Document> result = new ArrayList<>();
 		iterable.forEach(new Block<Document>() {
 			@Override
 			public void apply(final Document document) {

@@ -70,7 +70,7 @@ public class SearchController {
 		else
 			iterable = collection.find(query);
 
-		List<Document> result = new ArrayList<>();
+		final List<Document> result = new ArrayList<>();
 		iterable.forEach(new Block<Document>() {
 			@Override
 			public void apply(final Document document) {
@@ -107,7 +107,7 @@ public class SearchController {
 		}
 		query.put("$or", or);
 		
-		List<Document> result = new ArrayList<>();
+		final List<Document> result = new ArrayList<>();
 		if (!query.isEmpty()) {
 			iterable = collection.find(query);
 			iterable.forEach(new Block<Document>() {
