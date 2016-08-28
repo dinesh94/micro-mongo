@@ -39,7 +39,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * 
  * @author Dinesh B
  * 
- *         http://localhost:7742/mongo/rest/v2/api-docs http://localhost:7742/mongo/rest/swagger-ui.html
+ *         http://localhost/mongo/rest/v2/api-docs 
+ *         http://localhost/mongo/rest/swagger-ui.html
  *
  *
  * @Api
