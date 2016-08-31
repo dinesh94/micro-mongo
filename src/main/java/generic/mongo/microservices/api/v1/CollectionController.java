@@ -20,6 +20,7 @@ import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * @author Dinesh
@@ -37,7 +38,11 @@ public class CollectionController {
 	public synchronized ResponseEntity<?> createCollection(
 			@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName) {
-		mongoClient.getDatabase(dbName).createCollection(collectionName);
+		MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
+		mongoDatabase.createCollection(collectionName);
+		MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+		collection.createIndex(new Document("$**", "text"));// This is required for full test search
+		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

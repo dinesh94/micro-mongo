@@ -1,7 +1,7 @@
 /**
  * 
  */
-package generic.mongo.microservices.aop;
+package generic.mongo.microservices.api.v1.aop;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,12 +11,14 @@ import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 
@@ -53,6 +55,8 @@ public class CollectionDBCreatorAspect {
 			if (isCollectionExist == false) {
 				MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
 				mongoDatabase.createCollection(collectionName);
+				MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+				collection.createIndex(new Document("$**", "text"));// This is required for full test search
 				LOGGER.trace("Cellection {} does not exis & hence created new inside database {}", collectionName, dbName);
 			}
 
