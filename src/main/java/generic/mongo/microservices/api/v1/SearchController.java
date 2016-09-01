@@ -101,48 +101,60 @@ public class SearchController {
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
-	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs/{db}/{collection}/{keyword}/search")
+	@RequestMapping(method = { RequestMethod.GET }, value = "/dbs/{db}/{collection}/searchwords")
 	public synchronized ResponseEntity<?> search(@PathVariable("db") String dbName,
 			@PathVariable("collection") String collectionName,
-			@PathVariable("keyword") String keyword,
+			@RequestParam("keywords") List<String> keywords,
 			@RequestParam(required = false, value = "likesearch") Boolean likesearch,
 			@RequestParam(required = false, value = "searchFields") List<String> searchPaths) {
 
 		MongoCollection<Document> collection = mongoClient.getDatabase(dbName).getCollection(collectionName);
 		FindIterable<Document> iterable;
 
-		BasicDBList orCondition = new BasicDBList();
-		BasicDBObject query = new BasicDBObject();
-
-		Pattern regexKeyword = Pattern.compile(keyword);
-		
-		if (searchPaths != null && !searchPaths.isEmpty()) {
-			for (String searchField : searchPaths) {
-				BasicDBObject searchFor = new BasicDBObject();
-				//docIds.add(Integer.parseInt(value));
-				if (likesearch != null && likesearch) {
-					searchFor.put(searchField, regexKeyword);
-				} else {
-					searchFor.put(searchField, keyword);
-				}
-				//DBObject inClause = new BasicDBObject("$in", searchFor);
-				orCondition.add(searchFor);
-				//or.add(inClause);
-			}
-		} 
-		
-		if(searchPaths != null && !searchPaths.isEmpty()){
-			query.put("$or", orCondition);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (String keyword : keywords) {
+			stringBuilder.append(keyword + " ");
 		}
-		else{
+		
+		String keywordString = stringBuilder.toString();
+
+		BasicDBObject query = new BasicDBObject();
+		BasicDBObject joinQuery = new BasicDBObject();
+		List<BasicDBObject> orConditions = new ArrayList<BasicDBObject>();
+
+		if (searchPaths != null && !searchPaths.isEmpty()) {
+			BasicDBObject aCondition = new BasicDBObject();
+			BasicDBList valuesToSearch = new BasicDBList();
+			for (String searchField : searchPaths) {
+				//docIds.add(Integer.parseInt(value));
+				for (String keyword: keywords) {
+					if (likesearch != null && likesearch) {
+						valuesToSearch.add(Pattern.compile(keyword));
+					} else {
+						valuesToSearch.add(keyword);
+					}
+				}
+
+				DBObject inClause = new BasicDBObject("$in", valuesToSearch);
+				aCondition.put(searchField, inClause);
+				orConditions.add(aCondition);
+			}
+		}
+
+		if (searchPaths != null && !searchPaths.isEmpty()) {
+			joinQuery.put("$or", orConditions);
+			query = joinQuery;
+		} else {
 			BasicDBObject search;
 			if (likesearch != null && likesearch) {
-				search = new BasicDBObject("$text", new BasicDBObject("$search", regexKeyword));
-			}else{
-				search = new BasicDBObject("$text", new BasicDBObject("$search", keyword));
+				search = new BasicDBObject("$text", new BasicDBObject("$search", Pattern.compile(keywordString)));
+			} else {
+				search = new BasicDBObject("$text", new BasicDBObject("$search", keywordString));
 			}
 			query = search;
 		}
+
+		System.out.println("Query = " + query);
 
 		final List<Document> result = new ArrayList<>();
 		if (!query.isEmpty()) {
