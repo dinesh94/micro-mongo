@@ -46,7 +46,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @ApiClass
  * @ApiError
  * @ApiErrors
- * @ApiOperation
+ * @ApiOperation	
  * @ApiParam
  * @ApiParamImplicit
  * @ApiParamsImplicit
@@ -81,10 +81,7 @@ public class SwaggerConfig {
 								.code(500)
 								.message("500 message")
 								.responseModel(new ModelRef("Error"))
-								.build()))
-				.securitySchemes(newArrayList(apiKey()))
-				.securityContexts(newArrayList(securityContext()))
-				.enableUrlTemplating(true);
+								.build()));
 	}
 
 	private Predicate<String> apiPaths() {
