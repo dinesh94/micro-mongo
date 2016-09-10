@@ -54,8 +54,10 @@ public class CollectionObjectController {
 
 		MongoCollection<Document> collection = mongoClient.getDatabase(dbName).getCollection(collectionName);
 		List<Document> documents = CommonUtil.findObjects(collection, idParam);
-
-		return new ResponseEntity<>(documents, HttpStatus.FOUND);
+		Document document = new Document();
+		if(documents != null)
+		 document= documents.get(0);
+		return new ResponseEntity<>(document, HttpStatus.OK);
 	}
 
 	/**
