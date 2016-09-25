@@ -1,0 +1,4 @@
+git checkout url
+git status
+
+git add <<file1>> <<file2>> or git add .
